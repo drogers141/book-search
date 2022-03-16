@@ -1,16 +1,12 @@
-from textwrap import dedent
 from pathlib import Path
 import os
-import glob
 import logging
 
 import yaml
 from django.core.management.base import BaseCommand
-from django.utils import timezone, dateparse
-from django.db import DatabaseError
 from django.db.utils import IntegrityError
 
-from tergar_search.models import ParentDocument
+from book_search.models import ParentDocument
 
 
 logger = logging.getLogger(__name__)

@@ -1,12 +1,9 @@
-from textwrap import dedent
 from pathlib import Path
 import logging
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone, dateparse
-from django.db import DatabaseError
 
-from tergar_search.models import ParentDocument, ChildPage
+from book_search.models import ParentDocument, ChildPage
 
 
 logger = logging.getLogger(__name__)

@@ -6,8 +6,8 @@ from django_elasticsearch_dsl.registries import registry
 from .models import ChildPage
 
 
-tergar_analyzer = analyzer(
-    "tergar_analyzer",
+booksearch_analyzer = analyzer(
+    "booksearch_analyzer",
     tokenizer="standard",
     filter=['lowercase', 'asciifolding', 'porter_stem'],
     char_filter=['html_strip']
@@ -18,13 +18,13 @@ tergar_analyzer = analyzer(
 class ChildPageDocument(Document):
 
     content = fields.TextField(attr='html_content',
-                               analyzer=tergar_analyzer)
+                               analyzer=booksearch_analyzer)
     title = fields.TextField(fields={'keyword': Keyword()})
     author = fields.KeywordField(attr='author')
     course = fields.KeywordField(attr='course')
 
     class Index:
-        name = 'tergar'
+        name = 'booksearch'
         settings = {'number_of_shards': 1,
                     'number_of_replicas': 1}
 

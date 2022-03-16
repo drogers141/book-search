@@ -6,7 +6,13 @@ name = "pypi"
 [packages]
 django = "*"
 psycopg2-binary = "*"
+ipython = "*"
+beautifulsoup4 = "*"
 django-elasticsearch-dsl = "*"
+tika = "*"
+pyyaml = "*"
+oyaml = "*"
+lxml = "*"
 
 [dev-packages]
 

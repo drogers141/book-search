@@ -45,7 +45,7 @@ def add_highlight_count(query_return):
 def match_search(query: str) -> (int, list):
     client = Elasticsearch([{'host': host, 'port': port}], timeout=timeout)
     response = client.search(
-        index = "tergar",
+        index = "booksearch",
         body = {
             "_source": [
                 "author", "title", "course",
@@ -123,7 +123,7 @@ def match_search(query: str) -> (int, list):
 def match_phrase_search(query: str) -> (int, list):
     client = Elasticsearch([{'host': host, 'port': port}], timeout=timeout)
     response = client.search(
-        index = "tergar",
+        index = "booksearch",
         body = {
             "_source": [
                 "author", "title", "course",
