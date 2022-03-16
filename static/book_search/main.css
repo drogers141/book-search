@@ -1,0 +1,98 @@
+/********** Header Layout **********/
+
+@media screen and (min-width: 870px) {
+    header {
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+/******** Navigation *******/
+
+nav ul {
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+}
+
+nav li {
+    /*border-bottom: dotted 2px blueviolet;*/
+    list-style: none;
+    flex: 0 1 auto;
+}
+
+nav a {
+    text-decoration: none;
+}
+
+nav a:link, nav a:visited, nav a:focus {
+    /*flex: 1 1 auto;*/
+    display: inline-block;
+    color: white;
+    background: #4CAF50;
+    font-size: 24px;
+    /*width: 200px;*/
+    line-height: 2;
+    text-align: center;
+    /*border: solid 1px blueviolet;*/
+    margin-right: 5px;
+    padding: 0 10px;
+    /*background: lightseagreen;*/
+}
+
+nav a:hover {
+    background: #00784A;
+    color: #ffffaa;
+}
+
+nav a:active {
+    background: #001000;
+}
+
+nav {
+    margin: 16px 0;
+    /* change if font changes */
+    width: 443px;
+}
+
+a:link {
+    color: darkgreen;
+}
+
+a:visited {
+    color: darkcyan;
+}
+
+h1 {
+    text-align: center;
+    /*margin: 32px auto 32px 240px;*/
+}
+
+.button {
+    background-color: #4CAF50;
+    border: 1px solid white;
+    color: white;
+    padding: 2px 16px;
+    margin-right: 1em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+}
+.button:hover {
+    background-color: #00784A;
+    color: #ffffaa;
+}
+.button:active {
+    background: #001000;
+}
+
+.hidden {
+    display: none;
+}
+
+/*
+#4CAF50; good medium green
+#00784A; darker green
+ */

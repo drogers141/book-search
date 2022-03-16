@@ -1,0 +1,13 @@
+# postgresql
+
+drogers=# create database book_search;
+CREATE DATABASE
+drogers=# create user book_search_user with password 'book_search_pass123';
+CREATE ROLE
+drogers=# grant all privileges on database book_search to book_search_user;
+GRANT
+
+# allow testing - django creates test dbs
+drogers=# alter user book_search_user createdb;
+ALTER ROLE
+

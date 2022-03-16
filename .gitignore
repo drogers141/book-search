@@ -1,0 +1,12 @@
+__pycache__/
+*.swp
+
+# intellij
+*.iml
+.idea/
+
+# pyenv
+.python-version
+
+readme
+local-data/
