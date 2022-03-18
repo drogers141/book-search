@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}Base{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'book_search/main.css' %}">
+    <script src="{% static 'book_search/main.js' %}" defer></script>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li>
+            {% if user.is_authenticated %}
+                <a href="{% url 'account_logout' %}">Log Out</a>
+            {% else %}
+                <a href="{% url 'account_login' %}">Log In</a>
+            {% endif %}
+            </li>
+        </ul>
+    </nav>
+</header>
+<main>
+    {% block content %}
+    {% endblock content %}
+</main>
+</body>
+</html>

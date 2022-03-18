@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search</title>
+  <style>
+    body {
+
+    }
+    main {
+      margin: 20px auto;
+      /*
+      border: solid red 2px;
+      width: 75%;
+      display: grid;
+      grid-template-columns: 1fr;
+      */
+    }
+    form {
+      /* Center the form on the page */
+      margin: 0 auto;
+      width: 700px;
+      padding: 1em;
+      /* Form outline */
+      /*
+      padding: 1em;
+      border: 1px solid #CCC;
+      border-radius: 1em;
+      line-height: 1.5;
+      font-size: 1.5em;
+      border: 1px solid #CCC;
+      */
+
+    }
+    input {
+      height: 36px;
+      font-size: 16px;
+    }
+
+    input[type='text'] {
+      width: 600px;
+      margin-right: 10px;
+    }
+
+    .results {
+      width: 900px;
+      margin: 24px auto auto 100px;
+      {#padding: 16px 16px 16px 80px;#}
+      border-top: 1px solid #CCC;
+      font-size: 18px;
+      /*
+      border: solid green 1px;
+       */
+    }
+    .results ul  {
+      list-style: none;
+      padding: 0;
+      {#margin: 8px auto auto 8px;#}
+    }
+
+    .result-header {
+      font-size: 20px;
+      margin-top: 32px;
+      margin-bottom: 2px;
+      {#border-bottom: dotted blue 1px;#}
+      color: #00278e;
+      {#color: #4495d4;#}
+    }
+
+    .result-info {
+      margin-top: 2px;
+      margin-bottom: 2px;
+      color: #20692b;
+    }
+
+    .highlight-page {
+      {#font-size: 1.5em;#}
+    }
+
+    .result-highlight {
+      /*
+      margin: 8px auto auto 8px;
+       */
+      margin: 0;
+      color: #494949;
+    {#background: yellow;#}
+    }
+    .result-highlight li,
+    .result-highlight-multiple li {
+      {#background: yellow;#}
+      margin: 2px auto auto 8px;
+      {#list-style: square;#}
+    }
+    .result-highlight li:nth-child(even),
+    .result-highlight-multiple li:nth-child(even) {
+      background: #EFEFEF;
+    }
+
+    .multiple-hits {
+
+    }
+    .result-highlight-multiple {
+      border-top: solid 1px grey;
+    }
+
+    p {
+      margin: 0;
+    }
+    li {
+      margin-top: 32px;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <form action="/search/" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Search">
+    </form>
+    <div class="results">
+      <h4>{{ total_hits }} hit{{ total_hits|pluralize }}</h4>
+      <ul>
+        {% if results %}
+          {% for result in results %}
+            <li>
+              <ul>
+                <li>
+                  <div class="result-header"><p>{{ result.title }} - {{ result.author }}</p></div>
+                  <div class="result-info">
+                    <p>{{ result.course }} - Module {{ result.module }} Section {{ result.section }}</p>
+                  </div>
+                  {% if result.num_inner_hits > 1 %}
+                    <div class="multiple-hits"><p>{{ result.num_inner_hits }} pages match: </p></div>
+                    {% for inner_hit in result.inner_hits %}
+                    <div class="result-highlight-multiple">
+                      <p class="highlight-page">Page {{ inner_hit.page_number }} - {{ inner_hit.highlight_count }} highlights:
+                      <span class="viewer-link"> view page: {{ inner_hit.parent_doc_id }} / {{ inner_hit.page_number }}
+                      <a href="{% url 'view-page' inner_hit.parent_doc_id inner_hit.page_number %}">
+                        {% url 'view-page' inner_hit.parent_doc_id inner_hit.page_number %}
+                      </a>
+                      </span>
+                      </p>
+                      <ul>
+                      {% for highlight in inner_hit.highlights %}
+                        <li>{% autoescape off %}{{ highlight }}{% endautoescape %}</li>
+                      {% endfor %}
+                      </ul>
+                    </div>
+                    {% endfor %}
+                  {% else %}
+                    <div class="result-highlight">
+                      <p>{{ result.single_inner_hit.highlight_count }} highlights:</p>
+                      <ul>
+                        {% for highlight in result.single_inner_hit.highlights %}
+                          <li>{% autoescape off %}{{ highlight }}{% endautoescape %}</li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+
+{#                  <div class="result-highlight"><p>{% autoescape off %}{{ result.highlight }}{% endautoescape %}</p></div>#}
+{#                  <div class="result-highlight"><p>{{ result.highlight }}</p></div>#}
+                </li>
+              </ul>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+  </main>
+
+</body>
+</html>
