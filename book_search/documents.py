@@ -21,7 +21,6 @@ class ChildPageDocument(Document):
                                analyzer=booksearch_analyzer)
     title = fields.TextField(fields={'keyword': Keyword()})
     author = fields.KeywordField(attr='author')
-    course = fields.KeywordField(attr='course')
 
     class Index:
         name = 'booksearch'
@@ -31,8 +30,6 @@ class ChildPageDocument(Document):
     class Django:
         model = ChildPage
         fields = [
-            'module',
-            'section',
             'page_number',
             'parent_doc_id'
         ]

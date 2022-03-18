@@ -7,34 +7,30 @@ from django.db import models
 from bs4 import BeautifulSoup
 
 
+def extract_author_and_title(metadata):
+    pass
+
+
 class ParentDocument(models.Model):
-    """Each pdf file (or could be other formats) is represented here.
-
-    This just has the metadata.
+    """Each book/file is represented here.
     """
+    # source document's full path
+    filepath = models.CharField(max_length=1024)
 
-    # source document's filename
-    filename = models.CharField(max_length=1024)
-
-    # these make up the main metadata we care about
-    # add a uniqueness constraint to ensure that we don't create multiple
-    # copies when converting and then indexing
-    author = models.CharField(max_length=512)
-    title = models.CharField(max_length=512)
-    course = models.CharField(max_length=512)
-    module = models.IntegerField()
-    section = models.IntegerField()
+    # try to get the author and title from the document metadata
+    # but it's not always there
+    author = models.CharField(max_length=512, blank=True, default='')
+    title = models.CharField(max_length=512, blank=True, default='')
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'title', 'course', 'module', 'section'],
-                name='unique_metadata')
+                fields=['filepath',],
+                name='filepath')
         ]
 
     def __str__(self):
-        return (f"id: {self.id}  {self.author} - {self.title} {self.course} " +
-                f"M{self.module} S{self.section}")
+        return f"id: {self.id}  {self.author} - {self.title}"
 
     def convert_to_html_child_pages(self, filepath: str, clean=True):
         """Convert filepath (pdf at this point) to html pages.
@@ -42,7 +38,7 @@ class ParentDocument(models.Model):
         This constructs a ChildPage object for each page of the document.
         Pages are determined by Tika's parsing.
 
-        Populates self.filename as well as initializing children.
+        Populates author and title if available in the metadata.
 
         :param filepath - path to input [pdf] file
         :param clean - if True clean non-ascii whitespace
@@ -68,8 +64,7 @@ class ParentDocument(models.Model):
 
         for i, html in enumerate(pages):
             child = ChildPage(parent=self, page_number=i+1, html_content=html,
-                              author=self.author, title=self.title, course=self.course,
-                              module=self.module, section=self.section,
+                              author=self.author, title=self.title,
                               parent_doc_id=self.id)
             if i == len(pages) - 1:
                 child.is_last_page = True
@@ -79,6 +74,11 @@ class ParentDocument(models.Model):
 
 
 class ChildPage(models.Model):
+    """Each page of a book/file is represented by a ChildPage.
+
+    If you want the implementation to support browsing books as html files,
+    populate the html_content field.  If you want to save space, leave it empty.
+    """
 
     parent = models.ForeignKey(ParentDocument, on_delete=models.CASCADE)
     page_number = models.IntegerField()
@@ -88,9 +88,6 @@ class ChildPage(models.Model):
     # need to duplicate keys from parent so django-elasticsearch-dsl can access them
     author = models.CharField(max_length=512)
     title = models.CharField(max_length=512)
-    course = models.CharField(max_length=512)
-    module = models.IntegerField()
-    section = models.IntegerField()
 
     parent_doc_id = models.IntegerField()
 
@@ -98,5 +95,4 @@ class ChildPage(models.Model):
         return f"/{self.parent_doc_id}/{self.page_number}/"
 
     def __str__(self):
-        return (f"{self.author} - {self.title} {self.course} " +
-        f"M{self.module} S{self.section} - page {self.page_number}")
+        return (f"{self.author} - {self.title} - page {self.page_number}")
