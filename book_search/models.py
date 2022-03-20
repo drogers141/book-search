@@ -15,22 +15,15 @@ class ParentDocument(models.Model):
     """Each book/file is represented here.
     """
     # source document's full path
-    filepath = models.CharField(max_length=1024)
+    filepath = models.CharField(unique=True, max_length=1024)
 
     # try to get the author and title from the document metadata
     # but it's not always there
     author = models.CharField(max_length=512, blank=True, default='')
     title = models.CharField(max_length=512, blank=True, default='')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['filepath',],
-                name='filepath')
-        ]
-
     def __str__(self):
-        return f"id: {self.id}  {self.author} - {self.title}"
+        return f"id: {self.id}  {Path(self.filepath).name}"
 
     def convert_to_html_child_pages(self, filepath: str, clean=True):
         """Convert filepath (pdf at this point) to html pages.
@@ -76,8 +69,15 @@ class ParentDocument(models.Model):
 class ChildPage(models.Model):
     """Each page of a book/file is represented by a ChildPage.
 
-    If you want the implementation to support browsing books as html files,
-    populate the html_content field.  If you want to save space, leave it empty.
+    With the initial implementation, this model will also have the html_content
+    field filled with the full text of the page.  This is very inefficient
+    space-wise as you are storing the full text in the database as well as in
+    Elasticsearch.  But it allows reading the text online and being able to
+    navigate directly from the search to the location in the text.
+
+    The reason that it is mandatory now is due to using django-elasticsearch-dsl.
+    In the future, we can get rid of django-es-dsl and then allow an option to
+    not store the full text to save space.
     """
 
     parent = models.ForeignKey(ParentDocument, on_delete=models.CASCADE)
