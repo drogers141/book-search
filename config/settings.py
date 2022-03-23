@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'django_elasticsearch_dsl',
+    'django_extensions',
 
     # local
     'accounts',
@@ -186,3 +187,12 @@ ELASTICSEARCH_DSL = {
         'hosts': 'localhost:9200'
     }
 }
+
+# config to override Tika server config
+# in this case disabling Tesseract OCR in the default parser
+# this has an order of magnitude improvement on performance
+# for instance, 90 seconds without -> 3 seconds with
+# this assumes you don't want to OCR the pdf
+TIKA_CONFIG_FILE = '/Users/drogers/my-git/book-search/disable-tesseract-parser.xml'
+# how many times to retry call to Tika server if parsing fails
+TIKA_PARSE_MAX_RETRY = 3

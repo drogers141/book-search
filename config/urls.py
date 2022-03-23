@@ -21,6 +21,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     # Django admin
     path('admin/', admin.site.urls),
+    # User management
+    # path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('allauth.urls')),
     # Local app
     path('', include('book_search.urls')),
 ]

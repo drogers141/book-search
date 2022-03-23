@@ -1,14 +1,33 @@
 from io import StringIO
 import re
 from pathlib import Path
+import logging
 
-from tika import parser
 from django.db import models
+from django.conf import settings
 from bs4 import BeautifulSoup
+from tika import parser
+
+logger = logging.getLogger(__name__)
 
 
-def extract_author_and_title(metadata):
-    pass
+class TikaParseError(RuntimeError):
+    """Raised when the conversion of a document into html by Tika fails."""
+
+
+def extract_author_and_title(metadata: dict) -> (str, str):
+    """Try to get the author and title from the metadata.
+    Return empty strings if not found."""
+    author, title = '', ''
+    for key in ('Author', 'author', 'dc:creator', 'creator', 'meta:author'):
+        if key in metadata:
+            author = metadata[key]
+            break
+    for key in ('Title', 'title', 'dc:title', 'meta:title'):
+        if key in metadata:
+            title = metadata[key]
+            break
+    return author, title
 
 
 class ParentDocument(models.Model):
@@ -25,18 +44,30 @@ class ParentDocument(models.Model):
     def __str__(self):
         return f"id: {self.id}  {Path(self.filepath).name}"
 
-    def convert_to_html_child_pages(self, filepath: str, clean=True):
-        """Convert filepath (pdf at this point) to html pages.
+    def convert_to_html_child_pages(self, clean=True):
+        """Convert book/file at filepath to html pages.
 
         This constructs a ChildPage object for each page of the document.
         Pages are determined by Tika's parsing.
 
         Populates author and title if available in the metadata.
 
-        :param filepath - path to input [pdf] file
         :param clean - if True clean non-ascii whitespace
         """
-        data = parser.from_file(filepath, xmlContent=True)
+        try_count, successful_parse = 0, False
+        while try_count < settings.TIKA_PARSE_MAX_RETRY:
+            if settings.TIKA_CONFIG_FILE:
+                data = parser.from_file(str(self.filepath), xmlContent=True, config_path=settings.TIKA_CONFIG_FILE)
+            else:
+                data = parser.from_file(str(self.filepath), xmlContent=True)
+            if data['status'] == 200:
+                successful_parse = True
+                break
+        if not successful_parse:
+            logger.error('Failed to parse file: %s', self.filepath)
+        author, title = extract_author_and_title(data['metadata'])
+        self.author, self.title = author, title
+        self.save()
         soup = BeautifulSoup(data['content'], features='lxml')
         # convert all pages successfully before creating children
         pages = []
@@ -62,8 +93,6 @@ class ParentDocument(models.Model):
             if i == len(pages) - 1:
                 child.is_last_page = True
             child.save()
-
-        self.filename = Path(filepath).name
 
 
 class ChildPage(models.Model):
