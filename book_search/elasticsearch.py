@@ -48,15 +48,13 @@ def match_search(query: str) -> (int, list):
         index = "booksearch",
         body = {
             "_source": [
-                "author", "title", "course",
-                "section", "module", "parent_doc_id",
+                "author", "title", "parent_doc_id",
                 "page_number"
             ],
             "query": {
                 "match": {
                     "content": {
-                        # "query": f"{query}"
-                        "query": "second wisdom"
+                        "query": query
                     }
                 }
             },
@@ -66,8 +64,7 @@ def match_search(query: str) -> (int, list):
                     "name": "matched_pages",
                     "size": 5,
                     "_source": [
-                        "author", "title", "course",
-                        "section", "module", "parent_doc_id",
+                        "author", "title", "parent_doc_id",
                         "page_number"
                     ],
                     "highlight": {
@@ -90,9 +87,6 @@ def match_search(query: str) -> (int, list):
             'parent_doc_id': hit['_source']['parent_doc_id'],
             'title': hit['_source']['title'],
             'author': hit['_source']['author'],
-            'course': hit['_source']['course'],
-            'module': hit['_source']['module'],
-            'section': hit['_source']['section'],
             'num_inner_hits': len(hit['inner_hits']['matched_pages']['hits']['hits']),
             'inner_hits': []
         }
@@ -105,9 +99,6 @@ def match_search(query: str) -> (int, list):
                     'title': inner_hit['_source']['title'],
                     'author': inner_hit['_source']['author'],
                     'page_number': inner_hit['_source']['page_number'],
-                    'course': inner_hit['_source']['course'],
-                    'module': inner_hit['_source']['module'],
-                    'section': inner_hit['_source']['section'],
                     'highlights': [clean_highlight(highlight)
                                    for highlight in inner_hit['highlight']['content']]
 
@@ -126,14 +117,12 @@ def match_phrase_search(query: str) -> (int, list):
         index = "booksearch",
         body = {
             "_source": [
-                "author", "title", "course",
-                "section", "module", "parent_doc_id",
+                "author", "title", "parent_doc_id",
                 "page_number"
             ],
             "query": {
                 "match_phrase": {
                     "content": {
-                        # "query": f"{query}"
                         "query": query
                     }
                 }
@@ -144,8 +133,7 @@ def match_phrase_search(query: str) -> (int, list):
                     "name": "matched_pages",
                     "size": 5,
                     "_source": [
-                        "author", "title", "course",
-                        "section", "module", "parent_doc_id",
+                        "author", "title", "parent_doc_id",
                         "page_number"
                     ],
                     "highlight": {
@@ -168,9 +156,6 @@ def match_phrase_search(query: str) -> (int, list):
             'parent_doc_id': hit['_source']['parent_doc_id'],
             'title': hit['_source']['title'],
             'author': hit['_source']['author'],
-            'course': hit['_source']['course'],
-            'module': hit['_source']['module'],
-            'section': hit['_source']['section'],
             'num_inner_hits': len(hit['inner_hits']['matched_pages']['hits']['hits']),
             'inner_hits': []
         }
@@ -183,9 +168,6 @@ def match_phrase_search(query: str) -> (int, list):
                     'title': inner_hit['_source']['title'],
                     'author': inner_hit['_source']['author'],
                     'page_number': inner_hit['_source']['page_number'],
-                    'course': inner_hit['_source']['course'],
-                    'module': inner_hit['_source']['module'],
-                    'section': inner_hit['_source']['section'],
                     'highlights': [clean_highlight(highlight)
                                    for highlight in inner_hit['highlight']['content']]
 
