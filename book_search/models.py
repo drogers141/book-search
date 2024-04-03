@@ -87,9 +87,10 @@ class ParentDocument(models.Model):
             pages.append(page_soup.prettify())
 
         for i, html in enumerate(pages):
+            parent_filename = Path(self.filepath).name
             child = ChildPage(parent=self, page_number=i+1, html_content=html,
                               author=self.author, title=self.title,
-                              parent_doc_id=self.id)
+                              parent_doc_id=self.id, parent_filename=parent_filename)
             if i == len(pages) - 1:
                 child.is_last_page = True
             child.save()
@@ -119,6 +120,7 @@ class ChildPage(models.Model):
     title = models.CharField(max_length=512)
 
     parent_doc_id = models.IntegerField()
+    parent_filename = models.CharField(max_length=512)
 
     def url(self):
         return f"/{self.parent_doc_id}/{self.page_number}/"

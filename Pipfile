@@ -15,6 +15,9 @@ pyyaml = "*"
 oyaml = "*"
 lxml = "*"
 django-extensions = "*"
+urllib3 = "*"
+requests = "*"
+django-environ = "*"
 
 [dev-packages]
 

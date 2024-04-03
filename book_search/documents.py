@@ -31,7 +31,8 @@ class ChildPageDocument(Document):
         model = ChildPage
         fields = [
             'page_number',
-            'parent_doc_id'
+            'parent_doc_id',
+            'parent_filename',
         ]
 
         # Ignore auto updating of Elasticsearch when a model is saved

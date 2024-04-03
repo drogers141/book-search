@@ -128,10 +128,9 @@
             <li>
               <ul>
                 <li>
-                  <div class="result-header"><p>{{ result.title }} - {{ result.author }}</p></div>
-                  <div class="result-info">
-                    <p>{{ result.course }} - Module {{ result.module }} Section {{ result.section }}</p>
-                  </div>
+{#                  <div class="result-header"><p>{{ result.title }} - {{ result.author }}</p></div>#}
+                  <div class="result-header"><p>{{ result.parent_filename }}</p></div>
+                  
                   {% if result.num_inner_hits > 1 %}
                     <div class="multiple-hits"><p>{{ result.num_inner_hits }} pages match: </p></div>
                     {% for inner_hit in result.inner_hits %}

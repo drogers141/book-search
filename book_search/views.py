@@ -17,6 +17,7 @@ def search(request):
         if form.is_valid():
             query = form.cleaned_data
             total_hits, results = handle_query(query['query'])
+
             return render(request, "book_search/search.html",
                           {'form': form,
                            'total_hits': total_hits,

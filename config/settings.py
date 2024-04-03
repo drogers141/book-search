@@ -13,6 +13,14 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 
+import environ
+
+# Environment variables
+env = environ.Env(
+    DEBUG=(bool, False),
+    DJANGO_LOG_LEVEL=(str, 'INFO'),
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1+qy))qg&8x$*9oem%y)u1$^@_v*)10*fu-j!%9nf)bt0_1r6w'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -59,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -90,7 +99,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'book_search',
         'USER': 'book_search_user',
-        'PASSWORD': 'book_search_pass123',
+        'PASSWORD': env('DB_PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -194,10 +203,18 @@ AUTHENTICATION_BACKENDS = (
 )
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# elasticsearch
+ELASTIC_URL = 'https://localhost:9200'
+ELASTIC_USER = 'elastic'
+ELASTIC_PASSWORD = env('ELASTIC_PASSWORD')
+ELASTIC_CA_CERT = '/Users/drogers/software/search/elasticsearch-8.13.0/config/certs/http_ca.crt'
+
 # django-elasticsearch-dsl
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'localhost:9200'
+        'hosts': f'https://{ELASTIC_USER}:{ELASTIC_PASSWORD}@localhost:9200',
+        # 'use_ssl': True,
+        'ca_certs': ELASTIC_CA_CERT,
     }
 }
 

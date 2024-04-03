@@ -1,16 +1,17 @@
 import re
 from pprint import pprint
+import logging
+
+from django.conf import settings
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 
-import logging
-
 logger = logging.getLogger(__name__)
 
-host = "127.0.0.1"
-port = 9200
-timeout = 1000
+HOST = "https://127.0.0.1"
+PORT = 9200
+TIMEOUT = 1000
 
 EDGE_STRIP_REGEX = re.compile(r'^>|<$|^[,.\-:;"”]+')
 
@@ -43,13 +44,17 @@ def add_highlight_count(query_return):
 
 
 def match_search(query: str) -> (int, list):
-    client = Elasticsearch([{'host': host, 'port': port}], timeout=timeout)
+    # client = Elasticsearch([{'scheme': 'http', 'host': HOST, 'port': PORT}], timeout=TIMEOUT)
+    client = Elasticsearch(settings.ELASTIC_URL,
+                           basic_auth=(settings.ELASTIC_USER, settings.ELASTIC_PASSWORD),
+                           ca_certs=settings.ELASTIC_CA_CERT,
+                           timeout=TIMEOUT)
     response = client.search(
         index = "booksearch",
         body = {
             "_source": [
                 "author", "title", "parent_doc_id",
-                "page_number"
+                "page_number", "parent_filename"
             ],
             "query": {
                 "match": {
@@ -85,6 +90,7 @@ def match_search(query: str) -> (int, list):
         # pprint(hit)
         hit_return = {
             'parent_doc_id': hit['_source']['parent_doc_id'],
+            'parent_filename': hit['_source']['parent_filename'],
             'title': hit['_source']['title'],
             'author': hit['_source']['author'],
             'num_inner_hits': len(hit['inner_hits']['matched_pages']['hits']['hits']),
@@ -112,13 +118,16 @@ def match_search(query: str) -> (int, list):
 
 
 def match_phrase_search(query: str) -> (int, list):
-    client = Elasticsearch([{'host': host, 'port': port}], timeout=timeout)
+    client = Elasticsearch(settings.ELASTIC_URL,
+                           basic_auth=(settings.ELASTIC_USER, settings.ELASTIC_PASSWORD),
+                           ca_certs=settings.ELASTIC_CA_CERT,
+                           timeout=TIMEOUT)
     response = client.search(
         index = "booksearch",
         body = {
             "_source": [
                 "author", "title", "parent_doc_id",
-                "page_number"
+                "page_number", "parent_filename"
             ],
             "query": {
                 "match_phrase": {
@@ -154,6 +163,7 @@ def match_phrase_search(query: str) -> (int, list):
         # pprint(hit)
         hit_return = {
             'parent_doc_id': hit['_source']['parent_doc_id'],
+            'parent_filename': hit['_source']['parent_filename'],
             'title': hit['_source']['title'],
             'author': hit['_source']['author'],
             'num_inner_hits': len(hit['inner_hits']['matched_pages']['hits']['hits']),
